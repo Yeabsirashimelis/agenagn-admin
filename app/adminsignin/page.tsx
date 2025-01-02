@@ -8,7 +8,8 @@ function AdminSignInPage() {
  const [password, setPassword] = useState("")
  const {authenticateAdmin, signOutAdmin}=useAuth()
 
- function handleSubmit() {
+ function handleSubmit(e:any) {
+  e.preventDefault()
 const admin: Admin = {email, password, error:""}
     authenticateAdmin(admin);
  }

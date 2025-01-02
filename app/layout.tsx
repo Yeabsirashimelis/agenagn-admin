@@ -23,20 +23,29 @@ function AuthChecker({ children }: { children: React.ReactNode }) {
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    if (!isSignedIn) {
-      router.push("/adminsignin");
-      setCheckingAuth(false);
-    } else {
-      setCheckingAuth(false);
-    }
-  }, [isSignedIn, router]);
+    const checkAuth = async () => {
+      if (isSignedIn) {
+        // Redirect to home if signed in
+        router.push("/");
+      } else {
+        // Redirect to sign-in page if not signed in
+        router.push("/adminsignin");
+      }
+      setCheckingAuth(false); // Set checkingAuth to false after navigation
+    };
+
+    checkAuth(); // Call the checkAuth function
+  }, [isSignedIn, router]); // Dependencies only include isSignedIn and router
 
   if (checkingAuth) {
-    return <div>Loading...</div>; // Fallback UI while checking authentication
+    return <div>Loading...</div>; // Show loading if checking auth
   }
 
-  return <>{children}</>;
+  return <>{children}</>; // Render children if authenticated
 }
+
+
+
 
 
 

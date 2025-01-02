@@ -1,17 +1,18 @@
-"use client"
+"use client";
 
+import supabase from "@/supabase";
 import { createContext, useContext, useState, useEffect } from "react";
 
 // Define the structure of the admin
 export interface Admin {
   email: string;
   password: string;
-  error:string;
+  error?: string;
 }
 
 // Define the structure of the context
 interface AuthContextType {
-  authenticateAdmin: (personToSignIn: Admin) => Promise<void>;
+  authenticateAdmin: (user: Admin) => Promise<void>; // Updated to match the implementation
   signOutAdmin: () => void;
   isSignedIn: boolean;
   user: Admin | null;
@@ -21,46 +22,45 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<Admin | null>(() =>
-    JSON.parse(localStorage.getItem("user") || "null")
-  );
-  const [isSignedIn, setIsSignedIn] = useState(!!user);
+  const [user, setUser] = useState<Admin | null>(null);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   // Sync with localStorage on app initialization
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(storedUser);
-      setIsSignedIn(true);
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        setIsSignedIn(true);
+      } catch (err) {
+        console.error("Failed to parse user from localStorage:", err);
+      }
     }
   }, []);
 
-  // Authenticate an admin and update the context
-  async function authenticateAdmin(personToSignIn: Admin) {
-    try {
-      const res = await fetch(`https://localhost:8080/admin/signin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(personToSignIn),
-      });
+  // Update localStorage whenever the user changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
-      const data: Admin = await res.json();
+  async function authenticateAdmin(user: Admin) {
+    console.log(user);
 
-      if (!res.ok) throw new Error(data.error);
-
-      localStorage.setItem("user", JSON.stringify(data));
-      setUser(data);
+    // Simulated login check for local credentials
+    if (user.email === "shimelisyeabsira123@gmail.com" && user.password === "12345678") {
+      setUser(user);
       setIsSignedIn(true);
-    } catch (error) {
-      console.error("Failed to authenticate admin:", error);
+      console.log("Admin authenticated successfully:", user);
+      return;
     }
   }
 
-  // Sign out the admin
   function signOutAdmin() {
-    localStorage.removeItem("user");
     setUser(null);
     setIsSignedIn(false);
   }

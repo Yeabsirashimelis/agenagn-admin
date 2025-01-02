@@ -12,6 +12,7 @@ import {
   LinearScale,
   BarElement,
 } from "chart.js";
+import { useAuth } from "./adminsignin/AuthContext";
 
 // Register chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
@@ -72,6 +73,8 @@ export default function AdminDashboard() {
     },
   };
 
+  const {isSignedIn,signOutAdmin} = useAuth()
+
   return (
     <div className="p-8 bg-gradient-to-r from-gray-50 to-gray-100 min-h-screen">
       {/* Navigation Bar */}
@@ -84,9 +87,14 @@ export default function AdminDashboard() {
           <Link href="/propertiesToApprove">
             <span className="text-blue-600 hover:underline font-medium">Manage Properties</span>
           </Link>
+         { isSignedIn ? <button className="w-[100px] bg-red-500 px-2 py-1 rounded-lg">          
+    <Link href="/adminsignin" onClick={(e)=>{e.preventDefault();
+      signOutAdmin()
+    }}>Sign out</Link>
+</button> :
 <button className="w-[100px] bg-green-500 px-2 py-1 rounded-lg">          
     <Link href="/adminsignin">Sign In</Link>
-</button>
+</button>}
         </div>
       </nav>
 
